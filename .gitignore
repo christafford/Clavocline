@@ -25,7 +25,6 @@
 *.vspscc
 
 # Specific files
-[Aa]pp.config
 !Api.Log
 core.sln.docstates
 localconfig.build
@@ -36,7 +35,6 @@ test.aspx.cs
 test.aspx.designer.cs
 Thumbs.db
 [Tt]est[Rr]esult*
-[Ww]eb.config
 
 # Directories
 [Bb]in/

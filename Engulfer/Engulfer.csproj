@@ -44,12 +44,26 @@
     <Reference Include="MySql.Data.Entity.EF6">
       <HintPath>..\packages\MySql.Data.Entity.6.9.9\lib\net45\MySql.Data.Entity.EF6.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\packages\HtmlAgilityPack.1.5.1\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.HttpUtility">
+      <HintPath>..\packages\Mono.HttpUtility.1.0.0.1\lib\net40\Mono.HttpUtility.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MarketContext.cs" />
     <Compile Include="EodEntry.cs" />
+    <Compile Include="Agent\AgentAction.cs" />
+    <Compile Include="Agent\AgentAttachment.cs" />
+    <Compile Include="Agent\AgentDocument.cs" />
+    <Compile Include="Agent\AgentHandler.cs" />
+    <Compile Include="Agent\AgentSession.cs" />
+    <Compile Include="Agent\FormContainer.cs" />
+    <Compile Include="Agent\UserAgentUtil.cs" />
+    <Compile Include="Agent\TextUtil.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
