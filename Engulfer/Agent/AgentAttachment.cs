@@ -6,11 +6,11 @@ namespace Engulfer.Agent
 	{
 		#region Public Properties
 
-		public String AttachmentFileName { get; set; }
+		public string AttachmentFileName { get; set; }
 
-		public String AttachmentFileUrl { get; set; }
+		public string AttachmentFileUrl { get; set; }
 
-		public String AttachmentName { get; set; }
+		public string AttachmentName { get; set; }
 
 		#endregion
 	}

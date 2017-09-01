@@ -53,7 +53,7 @@ namespace Engulfer.Agent
 
 		#region Public Methods
 
-		public AgentAction CreateAction()
+		public AgentAction CreateLocalAction()
 		{
 			var formElements = Elements.Where(
 				element =>
@@ -61,7 +61,7 @@ namespace Engulfer.Agent
 					!string.IsNullOrEmpty(element.Name) &&
 					!string.IsNullOrEmpty(element.Value));
 
-			var action = new AgentAction(RequestUrl, DoPost);
+			var action = new AgentAction(FormAction, DoPost);
 
 			if (DoPost)
 			{

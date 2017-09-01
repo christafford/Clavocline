@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Engulfer.Agent
+namespace A123Lib.A123Core.Agent
 {
 	public static class UserAgentUtil
 	{

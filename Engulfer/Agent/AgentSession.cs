@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 
-namespace Engulfer.Agent
+namespace A123Lib.A123Core.Agent
 {
 	[Serializable]
 	public class AgentSession

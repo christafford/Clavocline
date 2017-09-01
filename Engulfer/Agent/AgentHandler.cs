@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using A123Lib.A123Core.Agent;
 using Mono.Web;
 
 namespace Engulfer.Agent
@@ -25,13 +27,7 @@ namespace Engulfer.Agent
 
 		#region Public Properties
 
-		public static AgentHandler Instance
-		{
-			get
-			{
-				return _instance ?? (_instance = new AgentHandler());
-			}
-		}
+		public static AgentHandler Instance => _instance ?? (_instance = new AgentHandler());
 
 		#endregion
 
@@ -126,35 +122,28 @@ namespace Engulfer.Agent
 					                       : actionResponse.GetResponseHeader("Location");
 
 				responseStream = actionResponse.GetResponseStream();
+				Debug.Assert(responseStream != null, "responseStream != null");
 				var responseBuilder = new StringWriter();
 
-				// now this looks less efficient than using a StreamReader (and it probably is), but at least this
-				// doesn't result in huge memory leaks.  the stream reader class bears investigation!
 				var buffer = new byte[1024];
 
-				try
+				int n;
+				do
 				{
-					int n;
-					do
+					n = responseStream.Read(buffer, 0, buffer.Length);
+
+					var charBuffer = new char[buffer.Length];
+					for (var i = 0; i < buffer.Length; i++)
 					{
-						n = responseStream.Read(buffer, 0, buffer.Length);
+						charBuffer[i] = (char)buffer[i];
+					}
 
-						var charBuffer = new char[buffer.Length];
-						for (var i = 0; i < buffer.Length; i++)
-						{
-							charBuffer[i] = (char)buffer[i];
-						}
-
-						responseBuilder.Write(charBuffer, 0, n);
-					} while (n > 0);
-				}
-				catch (Exception ex)
-				{
-					// A123LogController.Instance.Error(action.WebURL, ex);
-				}
+					responseBuilder.Write(charBuffer, 0, n);
+				} while (n > 0);
 
 				document.ResponseString = responseBuilder.GetStringBuilder().ToString();
 				responseBuilder.Close();
+				responseBuilder.Dispose();
 
 				document.Uri = actionResponse.ResponseUri.ToString();
 			}
@@ -162,24 +151,20 @@ namespace Engulfer.Agent
 			{
 				try
 				{
-					if (responseStream != null)
-					{
-						responseStream.Close();
-					}
+					responseStream?.Close();
 				}
 				catch
 				{
+					// ignored
 				}
 
 				try
 				{
-					if (actionResponse != null)
-					{
-						actionResponse.Close();
-					}
+					actionResponse?.Close();
 				}
 				catch
 				{
+					// ignored
 				}
 			}
 
@@ -250,10 +235,7 @@ namespace Engulfer.Agent
 				{
 					rs.Write(buffer, 0, bytesRead);
 				}
-				if (fileStream != null)
-				{
-					fileStream.Close();
-				}
+				fileStream?.Close();
 			}
 			var trailer = Encoding.ASCII.GetBytes("\r\n--" + boundary + "--\r\n");
 			rs.Write(trailer, 0, trailer.Length);
