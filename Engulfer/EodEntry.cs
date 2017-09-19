@@ -33,7 +33,7 @@ namespace Engulfer
 
 		[Column("Vol")]
 		[Required]
-		public double Volume { get; set; }
+		public double Vol { get; set; }
 
 		[Required]
 		public double OI { get; set; }
