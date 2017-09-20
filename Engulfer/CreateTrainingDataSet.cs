@@ -17,25 +17,31 @@ namespace Engulfer
 			
 			dataset.ForEach(data =>
 			{
-				var basicData = new BasicMLData(6)
+				var basicData = new BasicMLData(12)
 				{
-					[0] = data.TickerChangePastDay,
-					[1] = data.TickerChangePast5Days,
-					[2] = data.TickerChangePast10Days,
-					[3] = data.AverageRelationChangePastDay,
-					[4] = data.AverageRelationChangePast5Days,
-					[5] = data.AverageRelationChangePast10Days
+					[0] = data.TickerCloseChangePastDay,
+					[1] = data.TickerCloseChangePast2Days,
+					[2] = data.TickerCloseChangePast4Days,
+					[3] = data.AverageRelationCloseChangePastDay,
+					[4] = data.AverageRelationCloseChangePast2Days,
+					[5] = data.AverageRelationCloseChangePast4Days,
+					[6] = data.TickerVolToday,
+					[7] = data.TickerVolYesterday,
+					[8] = data.TickerVolPast2Days,
+					[9] = data.AverageRelationVolToday,
+					[10] = data.AverageRelationVolYesterday,
+					[11] = data.AverageRelationVolPast2Days
 				};
 
 				basicMLDataSet.Add(basicData, new BasicMLData(1)
 				{
-					[0] = data.TickerChangeNext
+					[0] = data.TickerCloseChangeNext
 				});
 			});
 
 			EncogUtility.SaveEGB(new FileInfo("/home/chriss/Projects/Clavocline/Data/training.clav"), basicMLDataSet);
 			
-			var network = EncogUtility.SimpleFeedForward(6, 6, 6, 1, true);			
+			var network = EncogUtility.SimpleFeedForward(12, 12, 6, 1, true);			
 			
 			EncogDirectoryPersistence.SaveObject(new FileInfo("/home/chriss/Projects/Clavocline/Data/network.clav"), network);
 		}

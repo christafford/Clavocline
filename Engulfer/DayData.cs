@@ -2,20 +2,32 @@
 {
 	public class DayData
 	{
-		// all values based on EOD
+		// inputs
+		public double TickerCloseChangePastDay { get; set; }
 		
-		public double TickerChangePastDay { get; set; }
+		public double TickerCloseChangePast2Days { get; set; }
 		
-		public double TickerChangePast5Days { get; set; }
+		public double TickerCloseChangePast4Days { get; set; }
 		
-		public double TickerChangePast10Days { get; set; }
+		public double AverageRelationCloseChangePastDay { get; set; }
 		
-		public double AverageRelationChangePastDay { get; set; }
+		public double AverageRelationCloseChangePast2Days { get; set; }
 		
-		public double AverageRelationChangePast5Days { get; set; }
-		
-		public double AverageRelationChangePast10Days { get; set; }
+		public double AverageRelationCloseChangePast4Days { get; set; }
 	
-		public double TickerChangeNext { get; set; }
+		public double TickerVolToday { get; set; }
+		
+		public double TickerVolYesterday { get; set; }
+		
+		public double TickerVolPast2Days { get; set; }
+		
+		public double AverageRelationVolToday { get; set; }
+		
+		public double AverageRelationVolYesterday { get; set; }
+		
+		public double AverageRelationVolPast2Days { get; set; }
+	
+		// output
+		public double TickerCloseChangeNext { get; set; }
 	}
 }
