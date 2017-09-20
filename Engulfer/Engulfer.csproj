@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CreateTrainingDataSet.cs" />
     <Compile Include="DayDataMaker.cs" />
     <Compile Include="DayData.cs" />
     <Compile Include="Program.cs" />
@@ -86,5 +87,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DbSchema\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\encog-core-cs\encog-core-cs.csproj">
+      <Project>{AC6FADF9-0904-4EBD-B22C-1C787C7E7A95}</Project>
+      <Name>encog-core-cs</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
