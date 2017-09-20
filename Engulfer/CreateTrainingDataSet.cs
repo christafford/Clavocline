@@ -1,4 +1,7 @@
-﻿using Encog.ML.Data.Basic;
+﻿using System.IO;
+using Encog.ML.Data.Basic;
+using Encog.Persist;
+using Encog.Util.Simple;
 
 namespace Engulfer
 {
@@ -8,7 +11,7 @@ namespace Engulfer
 		{
 			var basicMLDataSet = new BasicMLDataSet();
 			
-			var maker = new DayDataMaker();
+			var maker = new DayDataMaker(true);
 			maker.Init();
 			var dataset = maker.GetDatas();
 			
@@ -29,8 +32,12 @@ namespace Engulfer
 					[0] = data.TickerChangeNext
 				});
 			});
+
+			EncogUtility.SaveEGB(new FileInfo("/home/chriss/Projects/Clavocline/Data/training.clav"), basicMLDataSet);
 			
-			util
+			var network = EncogUtility.SimpleFeedForward(6, 6, 6, 1, true);			
+			
+			EncogDirectoryPersistence.SaveObject(new FileInfo("/home/chriss/Projects/Clavocline/Data/network.clav"), network);
 		}
 	}
 }

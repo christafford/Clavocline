@@ -68,5 +68,10 @@ values (@ParentTicker, @RelatedTicker, @Date)",
 				"select ParentTicker, RelatedTicker from TickerRelationships where ParentTicker = @ParentTicker",
 				new {ParentTicker = parent}).ToList();
 		}
+
+		public List<EodEntry> GetAllEodEntries(MySqlConnection connection)
+		{
+			return connection.Query<EodEntry>("select * from EodEntry").ToList();
+		}
 	}
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Engulfer
 {
@@ -9,12 +11,14 @@ namespace Engulfer
 		private readonly Dictionary<int, List<EodEntry>> _dataEachDay;
 		private readonly Dictionary<string, HashSet<string>> _parentToRelations;
 		private List<string> _allTickers;
+		private readonly bool _log;
 		
-		public DayDataMaker()
+		public DayDataMaker(bool log)
 		{
 			_allTickers = new List<string>();
 			_dataEachDay = new Dictionary<int, List<EodEntry>>();
 			_parentToRelations = new Dictionary<string, HashSet<string>>();
+			_log = log;
 		}
 
 		public void Init()
@@ -27,8 +31,18 @@ namespace Engulfer
 				{
 					connection.Open();
 
-					var allDays = db.EodEntries.ToList();
+					if (_log)
+					{
+						Console.WriteLine("Reading all eod entries");
+					}
 
+					var allDays = db.GetAllEodEntries(connection);
+
+					if (_log)
+					{
+						Console.WriteLine("organizing eod entries into days");
+					}
+					
 					var byDay = allDays.GroupBy(x => x.Date).ToDictionary(x => x.Key);
 
 					var days = allDays.Select(x => x.Date).Distinct().OrderBy(x => x).ToList();
@@ -40,15 +54,20 @@ namespace Engulfer
 						// exclude holidays
 						if (byDay[day].Any(x => x.Vol > 0))
 						{
-							_dataEachDay[count++] = byDay[day].ToList();
+							_dataEachDay[count++] = byDay[day].Where(x => x.Close > 0).ToList();
 						}
 					}
 
 					_allTickers = allDays.Select(x => x.Ticker).Distinct().ToList();
 
+					if (_log)
+					{
+						Console.WriteLine("Gathering related tickers per ticker");
+					}
+
 					foreach (var ticker in _allTickers)
 					{
-						var relationships = db.GetRelations(ticker, connection);
+						var relationships = db.GetRelations(ticker, connection);	
 						_parentToRelations[ticker] = new HashSet<string>(relationships.Select(x => x.RelatedTicker));
 					}
 				}
@@ -63,9 +82,18 @@ namespace Engulfer
 			}
 
 			var dayDatas = new List<DayData>();
-				
+			
+			var stopwatch = new Stopwatch();
+
 			for (var count = 10; count < _dataEachDay.Count - 1; count++)
 			{
+				stopwatch.Restart();
+
+				if (_log)
+				{
+					Console.Write($"Day {count} of {_dataEachDay.Count - 1}...");
+				}
+
 				var tenDays = _dataEachDay[count - 10];
 				var fiveDays = _dataEachDay[count - 5];
 				var previousDay = _dataEachDay[count - 1];
@@ -79,29 +107,37 @@ namespace Engulfer
 					.Intersect(tomorrow.Select(x => x.Ticker));
 
 				var tickerToData = new Dictionary<string, DayData>();
-				
-				foreach (var ticker in tickerSubset)
+
+				Parallel.ForEach(tickerSubset, ticker =>
 				{
 					var dayData = new DayData();
-					var tickerCurrentDay = currentDay.First(ticker.Equals);
-					
-					dayData.TickerChangePastDay = (double) ((tickerCurrentDay.Close - previousDay.First(ticker.Equals).Close) /
-					                                        previousDay.First(ticker.Equals).Close);
-					
-					dayData.TickerChangePast5Days = (double) ((tickerCurrentDay.Close - fiveDays.First(ticker.Equals).Close) /
-					                                          fiveDays.First(ticker.Equals).Close);
+					var tickerCurrentDay = currentDay.First(x => x.Ticker.Equals(ticker));
+					decimal temp;
 
-					dayData.TickerChangePast10Days = (double) ((tickerCurrentDay.Close - tenDays.First(ticker.Equals).Close) /
-					                                           tenDays.First(ticker.Equals).Close);
+					dayData.TickerChangePastDay = (double)
+					((tickerCurrentDay.Close - (temp = previousDay.First(x => x.Ticker.Equals(ticker)).Close))
+					 / temp);
+
+					dayData.TickerChangePast5Days = (double)
+					((tickerCurrentDay.Close - (temp = fiveDays.First(x => x.Ticker.Equals(ticker)).Close))
+					 / temp);
+
+					dayData.TickerChangePast10Days = (double)
+					((tickerCurrentDay.Close - (temp = tenDays.First(x => x.Ticker.Equals(ticker)).Close))
+					 / temp);
+
+					dayData.TickerChangeNext = (double)
+					((tomorrow.First(x => x.Ticker.Equals(ticker)).Close - tickerCurrentDay.Close)
+					 / tickerCurrentDay.Close);
 					
-					dayData.TickerChangeNext =  (double) ((tomorrow.First(ticker.Equals).Close - tickerCurrentDay.Close) /
-					                                      tickerCurrentDay.Close);
-					
-					tickerToData[ticker] = dayData;
-				}
+					lock (this)
+					{
+						tickerToData[ticker] = dayData;
+					}
+				});
 
 				var allDataForDay = tickerToData.Values.ToList();
-				
+
 				var sdChangePastDay = StandardDeviation(allDataForDay.Select(x => x.TickerChangePastDay).ToList());
 				var sdChangePast5Days = StandardDeviation(allDataForDay.Select(x => x.TickerChangePast5Days).ToList());
 				var sdChangePast10Days = StandardDeviation(allDataForDay.Select(x => x.TickerChangePast10Days).ToList());
@@ -114,25 +150,44 @@ namespace Engulfer
 					dayData.TickerChangePast10Days /= sdChangePast10Days;
 					dayData.TickerChangeNext /= sdChangeNext;
 				});
-					
-				tickerToData.Keys.ToList().ForEach(ticker =>
+
+				Parallel.ForEach(tickerToData.Keys, ticker =>
 				{
 					var dayData = tickerToData[ticker];
-					var relations = _parentToRelations[ticker];
+					var relations = _parentToRelations[ticker].Where(relation => tickerToData.ContainsKey(relation)).ToList();
 
+					// ignore anything without related stocks
+					if (!relations.Any())
+					{
+						return;
+					}
+					
 					dayData.AverageRelationChangePastDay =
 						relations.Select(relation => tickerToData[relation].TickerChangePastDay).Average();
-					
+
 					dayData.AverageRelationChangePast5Days =
 						relations.Select(relation => tickerToData[relation].TickerChangePast5Days).Average();
-					
+
 					dayData.AverageRelationChangePast10Days =
 						relations.Select(relation => tickerToData[relation].TickerChangePast10Days).Average();
-					
-					dayDatas.Add(dayData);
+
+					lock (this)
+					{
+						dayDatas.Add(dayData);
+					}
 				});
+
+				if (_log)
+				{
+					Console.WriteLine($" {stopwatch.Elapsed.TotalSeconds} seconds");
+				}
 			}
 
+			if (_log)
+			{
+				Console.WriteLine("Done");
+			}
+			
 			return dayDatas;
 		}
 

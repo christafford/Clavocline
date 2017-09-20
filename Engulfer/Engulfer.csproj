@@ -78,6 +78,7 @@
     <Compile Include="Agent\UserAgentUtil.cs" />
     <Compile Include="Agent\TextUtil.cs" />
     <Compile Include="TickerRelationships.cs" />
+    <Compile Include="TrainingDay.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
