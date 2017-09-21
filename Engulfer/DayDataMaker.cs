@@ -85,56 +85,54 @@ namespace Engulfer
 			
 			var stopwatch = new Stopwatch();
 
-			for (var count = 4; count < _dataEachDay.Count - 1; count++)
+			for (var count = 5; count < _dataEachDay.Count - 1; count++)
 			{
 				stopwatch.Restart();
 
 				if (_log)
 				{
-					Console.Write($"Day {count} of {_dataEachDay.Count - 1}...");
+					Console.Write($"Day {count} of {_dataEachDay.Count - 2}...");
 				}
 
-				var fourDays = _dataEachDay[count - 4];
-				var twoDays = _dataEachDay[count - 2];
-				var previousDay = _dataEachDay[count - 1];
-				var currentDay = _dataEachDay[count];
-				var tomorrow = _dataEachDay[count + 1];
+				var days5 = _dataEachDay[count - 5];
+				var days4 = _dataEachDay[count - 4];
+				var days3 = _dataEachDay[count - 3];
+				var days2 = _dataEachDay[count - 2];
+				var days1 = _dataEachDay[count - 1];
+				var days0 = _dataEachDay[count];
+				var daysT = _dataEachDay[count + 1];
 
-				var tickerSubset = fourDays.Select(x => x.Ticker)
-					.Intersect(twoDays.Select(x => x.Ticker))
-					.Intersect(previousDay.Select(x => x.Ticker))
-					.Intersect(currentDay.Select(x => x.Ticker))
-					.Intersect(tomorrow.Select(x => x.Ticker));
+				var tickerSubset = days5.Select(x => x.Ticker)
+					.Intersect(days4.Select(x => x.Ticker))
+					.Intersect(days3.Select(x => x.Ticker))
+					.Intersect(days2.Select(x => x.Ticker))
+					.Intersect(days1.Select(x => x.Ticker))
+					.Intersect(days0.Select(x => x.Ticker))
+					.Intersect(daysT.Select(x => x.Ticker));
 
 				var tickerToData = new Dictionary<string, DayData>();
 
 				Parallel.ForEach(tickerSubset, ticker =>
 				{
 					var dayData = new DayData();
-					var tickerCurrentDay = currentDay.First(x => x.Ticker.Equals(ticker));
-					decimal temp;
-
-					dayData.TickerCloseChangePastDay = (double)
-						((tickerCurrentDay.Close - (temp = previousDay.First(x => x.Ticker.Equals(ticker)).Close))
-						 / temp);
-
-					dayData.TickerCloseChangePast2Days = (double)
-						((tickerCurrentDay.Close - (temp = twoDays.First(x => x.Ticker.Equals(ticker)).Close))
-						 / temp);
-
-					dayData.TickerCloseChangePast4Days = (double)
-						((tickerCurrentDay.Close - (temp = fourDays.First(x => x.Ticker.Equals(ticker)).Close))
-						 / temp);
-
-					dayData.TickerVolToday = tickerCurrentDay.Vol;
-
-					dayData.TickerVolYesterday = previousDay.First(x => x.Ticker.Equals(ticker)).Vol;
-
-					dayData.TickerVolPast2Days = twoDays.First(x => x.Ticker.Equals(ticker)).Vol;
 					
-					dayData.TickerCloseChangeNext = (double)
-						((tomorrow.First(x => x.Ticker.Equals(ticker)).Close - tickerCurrentDay.Close)
-						 / tickerCurrentDay.Close);
+					var day5 = days5.First(x => x.Ticker.Equals(ticker));
+					var day4 = days4.First(x => x.Ticker.Equals(ticker));
+					var day3 = days3.First(x => x.Ticker.Equals(ticker));
+					var day2 = days2.First(x => x.Ticker.Equals(ticker));
+					var day1 = days1.First(x => x.Ticker.Equals(ticker));
+					var day0 = days0.First(x => x.Ticker.Equals(ticker));
+					var dayT = daysT.First(x => x.Ticker.Equals(ticker));
+
+					dayData.TickerCloseChangePastDay = (double) ((day0.Close - day1.Close) / day1.Close);
+					dayData.TickerCloseChangePast2Days = (double) ((day0.Close - day2.Close) / day2.Close);
+					dayData.TickerCloseChangePast4Days = (double) ((day0.Close - day4.Close) / day4.Close);
+					dayData.TickerCloseChangeNext = (double) ((dayT.Close - day0.Close) / day0.Close);
+					
+					var tickerVolLately = (day2.Vol + day3.Vol + day4.Vol + day5.Vol) / 4;
+
+					dayData.TickerVolTodayVsLately = (day0.Vol - tickerVolLately) / tickerVolLately;
+					dayData.TickerVolYesterdayVsLately = (day1.Vol - tickerVolLately) / tickerVolLately;
 					
 					lock (this)
 					{
@@ -147,9 +145,8 @@ namespace Engulfer
 				var sdCloseChangePastDay = StandardDeviation(allDataForDay.Select(x => x.TickerCloseChangePastDay).ToList());
 				var sdCloseChangePast2Days = StandardDeviation(allDataForDay.Select(x => x.TickerCloseChangePast2Days).ToList());
 				var sdCloseChangePast4Days = StandardDeviation(allDataForDay.Select(x => x.TickerCloseChangePast4Days).ToList());
-				var sdVolToday = StandardDeviation(allDataForDay.Select(x => x.TickerVolToday).ToList());
-				var sdVolYesterday = StandardDeviation(allDataForDay.Select(x => x.TickerVolYesterday).ToList());
-				var sdVolPast2Days = StandardDeviation(allDataForDay.Select(x => x.TickerVolPast2Days).ToList());
+				var sdVolChangeToday = StandardDeviation(allDataForDay.Select(x => x.TickerVolTodayVsLately).ToList());
+				var sdVolChangeYesterday = StandardDeviation(allDataForDay.Select(x => x.TickerVolYesterdayVsLately).ToList());
 				var sdChangeNext = StandardDeviation(allDataForDay.Select(x => x.TickerCloseChangeNext).ToList());
 
 				tickerToData.Values.ToList().ForEach(dayData =>
@@ -157,9 +154,8 @@ namespace Engulfer
 					dayData.TickerCloseChangePastDay = (dayData.TickerCloseChangePastDay - sdCloseChangePastDay.Average) / sdCloseChangePastDay.StandardDeviation;
 					dayData.TickerCloseChangePast2Days = (dayData.TickerCloseChangePast2Days - sdCloseChangePast2Days.Average) / sdCloseChangePast2Days.StandardDeviation;
 					dayData.TickerCloseChangePast4Days = (dayData.TickerCloseChangePast4Days - sdCloseChangePast4Days.Average) / sdCloseChangePast4Days.StandardDeviation;
-					dayData.TickerVolToday = (dayData.TickerVolToday - sdVolToday.Average) / sdVolToday.StandardDeviation;
-					dayData.TickerVolYesterday = (dayData.TickerVolYesterday - sdVolYesterday.Average) / sdVolYesterday.StandardDeviation;
-					dayData.TickerVolPast2Days = (dayData.TickerVolPast2Days - sdVolPast2Days.Average) / sdVolPast2Days.StandardDeviation;
+					dayData.TickerVolTodayVsLately = (dayData.TickerVolTodayVsLately - sdVolChangeToday.Average) / sdVolChangeToday.StandardDeviation;
+					dayData.TickerVolYesterdayVsLately = (dayData.TickerVolYesterdayVsLately - sdVolChangeYesterday.Average) / sdVolChangeYesterday.StandardDeviation;
 					dayData.TickerCloseChangeNext = (dayData.TickerCloseChangeNext - sdChangeNext.Average) / sdChangeNext.StandardDeviation;
 				});
 
@@ -183,14 +179,11 @@ namespace Engulfer
 					dayData.AverageRelationCloseChangePast4Days =
 						relations.Select(relation => tickerToData[relation].TickerCloseChangePast4Days).Average();
 
-					dayData.AverageRelationVolToday =
-						relations.Select(relation => tickerToData[relation].TickerVolToday).Average();
+					dayData.AverageRelationVolTodayVsLately =
+						relations.Select(relation => tickerToData[relation].TickerVolTodayVsLately).Average();
 
-					dayData.AverageRelationVolYesterday =
-						relations.Select(relation => tickerToData[relation].TickerVolYesterday).Average();
-
-					dayData.AverageRelationVolPast2Days =
-						relations.Select(relation => tickerToData[relation].TickerVolPast2Days).Average();
+					dayData.AverageRelationVolYesterdayVsLately =
+						relations.Select(relation => tickerToData[relation].TickerVolYesterdayVsLately).Average();
 
 					lock (this)
 					{

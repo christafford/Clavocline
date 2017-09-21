@@ -7,8 +7,8 @@
 			//TickerDataDownloader.Run();
 			//Relationshipper.Run();
 			CreateTrainingDataSet.Run();
-			Pruner.Run();
-			TrainingDay.Run();
+			//Pruner.Run();
+			//TrainingDay.Run();
 		}
 	}
 }

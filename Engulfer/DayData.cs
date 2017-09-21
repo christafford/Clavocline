@@ -15,18 +15,14 @@
 		
 		public double AverageRelationCloseChangePast4Days { get; set; }
 	
-		public double TickerVolToday { get; set; }
+		public double TickerVolTodayVsLately { get; set; }
 		
-		public double TickerVolYesterday { get; set; }
+		public double TickerVolYesterdayVsLately { get; set; }
 		
-		public double TickerVolPast2Days { get; set; }
+		public double AverageRelationVolTodayVsLately { get; set; }
 		
-		public double AverageRelationVolToday { get; set; }
+		public double AverageRelationVolYesterdayVsLately { get; set; }
 		
-		public double AverageRelationVolYesterday { get; set; }
-		
-		public double AverageRelationVolPast2Days { get; set; }
-	
 		// output
 		public double TickerCloseChangeNext { get; set; }
 	}
