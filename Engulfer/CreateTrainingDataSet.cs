@@ -37,7 +37,7 @@ namespace Engulfer
 				});
 			});
 
-			EncogUtility.SaveEGB(new FileInfo("/home/chriss/Projects/Clavocline/Data/training.clav"), basicMLDataSet);
+			EncogUtility.SaveEGB(Config.TrainingFile, basicMLDataSet);
 		}
 	}
 }
