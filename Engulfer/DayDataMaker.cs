@@ -54,7 +54,7 @@ namespace Engulfer
 						// exclude holidays
 						if (byDay[day].Any(x => x.Vol > 0))
 						{
-							_dataEachDay[count++] = byDay[day].Where(x => x.Close > 0).ToList();
+							_dataEachDay[count++] = byDay[day].Where(x => x.Close > 0 && x.Vol > 0).ToList();
 						}
 					}
 
@@ -128,8 +128,8 @@ namespace Engulfer
 					dayData.TickerCloseChangePast2Days = (double) ((day0.Close - day2.Close) / day2.Close);
 					dayData.TickerCloseChangePast4Days = (double) ((day0.Close - day4.Close) / day4.Close);
 					dayData.TickerCloseChangeNext = (double) ((dayT.Close - day0.Close) / day0.Close);
-					
-					var tickerVolLately = (day2.Vol + day3.Vol + day4.Vol + day5.Vol) / 4;
+
+					var tickerVolLately = new[] {day2.Vol + day3.Vol + day4.Vol + day5.Vol}.Average();
 
 					dayData.TickerVolTodayVsLately = (day0.Vol - tickerVolLately) / tickerVolLately;
 					dayData.TickerVolYesterdayVsLately = (day1.Vol - tickerVolLately) / tickerVolLately;

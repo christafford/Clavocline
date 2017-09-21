@@ -38,6 +38,9 @@ namespace Engulfer
 			});
 
 			EncogUtility.SaveEGB(Config.TrainingFile, basicMLDataSet);
+			
+			var network = EncogUtility.SimpleFeedForward(10, 20, 10, 1, true);
+			EncogDirectoryPersistence.SaveObject(Config.NetworkFile, network);
 		}
 	}
 }
