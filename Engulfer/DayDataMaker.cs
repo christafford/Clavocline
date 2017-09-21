@@ -154,13 +154,13 @@ namespace Engulfer
 
 				tickerToData.Values.ToList().ForEach(dayData =>
 				{
-					dayData.TickerCloseChangePastDay /= sdCloseChangePastDay;
-					dayData.TickerCloseChangePast2Days /= sdCloseChangePast2Days;
-					dayData.TickerCloseChangePast4Days /= sdCloseChangePast4Days;
-					dayData.TickerVolToday /= sdVolToday;
-					dayData.TickerVolYesterday /= sdVolYesterday;
-					dayData.TickerVolPast2Days /= sdVolPast2Days;
-					dayData.TickerCloseChangeNext /= sdChangeNext;
+					dayData.TickerCloseChangePastDay = (dayData.TickerCloseChangePastDay - sdCloseChangePastDay.Average) / sdCloseChangePastDay.StandardDeviation;
+					dayData.TickerCloseChangePast2Days = (dayData.TickerCloseChangePast2Days - sdCloseChangePast2Days.Average) / sdCloseChangePast2Days.StandardDeviation;
+					dayData.TickerCloseChangePast4Days = (dayData.TickerCloseChangePast4Days - sdCloseChangePast4Days.Average) / sdCloseChangePast4Days.StandardDeviation;
+					dayData.TickerVolToday = (dayData.TickerVolToday - sdVolToday.Average) / sdVolToday.StandardDeviation;
+					dayData.TickerVolYesterday = (dayData.TickerVolYesterday - sdVolYesterday.Average) / sdVolYesterday.StandardDeviation;
+					dayData.TickerVolPast2Days = (dayData.TickerVolPast2Days - sdVolPast2Days.Average) / sdVolPast2Days.StandardDeviation;
+					dayData.TickerCloseChangeNext = (dayData.TickerCloseChangeNext - sdChangeNext.Average) / sdChangeNext.StandardDeviation;
 				});
 
 				Parallel.ForEach(tickerToData.Keys, ticker =>
@@ -212,11 +212,23 @@ namespace Engulfer
 			return dayDatas;
 		}
 
-		private static double StandardDeviation(List<double> someDoubles)
+		private static Sd StandardDeviation(List<double> someDoubles)
 		{
 			var average = someDoubles.Average();
 			var sumOfSquaresOfDifferences = someDoubles.Select(val => (val - average) * (val - average)).Sum();
-			return Math.Sqrt(sumOfSquaresOfDifferences / someDoubles.Count());
+			
+			return new Sd
+			{
+				Average = average,
+				StandardDeviation = Math.Sqrt(sumOfSquaresOfDifferences / someDoubles.Count())
+			};
 		}
+	}
+
+	struct Sd
+	{
+		public double Average;
+		public double StandardDeviation;
+
 	}
 }

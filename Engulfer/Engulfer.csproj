@@ -64,6 +64,7 @@
     <Compile Include="DayDataMaker.cs" />
     <Compile Include="DayData.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Pruner.cs" />
     <Compile Include="Relationshipper.cs" />
     <Compile Include="TickerDataDownloader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

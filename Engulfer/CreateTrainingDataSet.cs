@@ -41,7 +41,7 @@ namespace Engulfer
 
 			EncogUtility.SaveEGB(new FileInfo("/home/chriss/Projects/Clavocline/Data/training.clav"), basicMLDataSet);
 			
-			var network = EncogUtility.SimpleFeedForward(12, 12, 6, 1, true);			
+			var network = EncogUtility.SimpleFeedForward(12, 24, 6, 1, true);			
 			
 			EncogDirectoryPersistence.SaveObject(new FileInfo("/home/chriss/Projects/Clavocline/Data/network.clav"), network);
 		}
