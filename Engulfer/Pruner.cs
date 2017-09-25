@@ -35,6 +35,7 @@ namespace Engulfer
 			prune.Process();
 
 			EncogDirectoryPersistence.SaveObject(Config.NetworkFile, prune.BestNetwork);
+			EncogUtility.SaveEGB(Config.TrainingFile, prune.Training);
 		}
 	}
 }
