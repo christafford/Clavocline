@@ -3,6 +3,8 @@ using System.IO;
 using Encog;
 using Encog.ML.Data;
 using Encog.Neural.Networks;
+using Encog.Neural.Networks.Training.Propagation;
+using Encog.Neural.Networks.Training.Propagation.Resilient;
 using Encog.Persist;
 using Encog.Util.File;
 using Encog.Util.Simple;
@@ -18,12 +20,19 @@ namespace Engulfer
 
 			while (true)
 			{
-				// train the neural network
-				EncogUtility.TrainConsole(network, trainingSet, 10);
+				Propagation train = new ResilientPropagation(
+					network,
+					trainingSet)
+				{
+					ThreadCount = 0,
+					FixFlatSpot = false
+				};
+				
+				EncogUtility.TrainConsole(train, network, trainingSet, TimeSpan.FromMinutes(10).TotalSeconds);
 
-				Console.WriteLine(@"Final Error: " + network.CalculateError(trainingSet));
-				Console.WriteLine(@"Training complete, saving network.");
+				Console.WriteLine("Finished. Saving network...");
 				EncogDirectoryPersistence.SaveObject(Config.NetworkFile, network);
+
 				Console.WriteLine(@"Network saved.");
 			}
 		}
