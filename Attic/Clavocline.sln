@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engulfer", "Engulfer\Engulfer.csproj", "{1E102997-34FF-48E6-9BE5-F0BEF7E07686}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7A600956-756F-4F1B-9EEE-A98229CC3DFB}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "encog-core-cs", "encog-core-cs\encog-core-cs.csproj", "{AC6FADF9-0904-4EBD-B22C-1C787C7E7A95}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1E102997-34FF-48E6-9BE5-F0BEF7E07686}.Debug|x86.ActiveCfg = Debug|x86
+		{1E102997-34FF-48E6-9BE5-F0BEF7E07686}.Debug|x86.Build.0 = Debug|x86
+		{1E102997-34FF-48E6-9BE5-F0BEF7E07686}.Release|x86.ActiveCfg = Release|x86
+		{1E102997-34FF-48E6-9BE5-F0BEF7E07686}.Release|x86.Build.0 = Release|x86
+		{AC6FADF9-0904-4EBD-B22C-1C787C7E7A95}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AC6FADF9-0904-4EBD-B22C-1C787C7E7A95}.Debug|x86.Build.0 = Debug|Any CPU
+		{AC6FADF9-0904-4EBD-B22C-1C787C7E7A95}.Release|x86.ActiveCfg = Release|Any CPU
+		{AC6FADF9-0904-4EBD-B22C-1C787C7E7A95}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.FileWidth = 80
+		$1.TabsToSpaces = True
+		$1.scope = text/plain
+		$0.TextStylePolicy = $2
+		$2.inheritsSet = null
+		$2.scope = application/config+xml
+		$0.XmlFormattingPolicy = $3
+		$3.inheritsSet = null
+		$3.scope = application/config+xml
+	EndGlobalSection
+EndGlobal
